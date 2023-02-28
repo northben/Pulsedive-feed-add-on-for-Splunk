@@ -1,0 +1,67 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "run container",
+            "type": "shell",
+            "command": "docker run -d -p 8000:8000 -e 'SPLUNK_START_ARGS=--accept-license' -e 'SPLUNK_PASSWORD=password' --name splunk --mount type=bind,source=\"$(pwd)\"/TA-pulsedive-feed,target=/opt/splunk/etc/apps/TA-pulsedive-feed splunk/splunk:latest",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "run initial container with AoB",
+            "type": "shell",
+            "command": "docker run -d -p 8000:8000 -e 'SPLUNK_START_ARGS=--accept-license' -e 'SPLUNK_PASSWORD=password' --name splunk --mount type=bind,source=\"$(pwd)\"/splunk_app_addon-builder,target=/opt/splunk/etc/apps/splunk_app_addon-builder splunk/splunk:latest",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "exec shell into container",
+            "type": "shell",
+            "command": "docker exec -u splunk -it splunk bash",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "copy TA from AoB container",
+            "type": "shell",
+            "command": "docker cp splunk:/opt/splunk/etc/apps/TA-pulsedive-feed .",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "remove container",
+            "type": "shell",
+            "command": "docker rm -f splunk",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "package the app",
+            "type": "shell",
+            "command": "mv TA-pulsedive-feed/local /tmp/; find . \\( -name local.meta -o -name .DS_Store -o -name \\*.pyc \\) -exec rm -f {} \\; ; COPYFILE_DISABLE=1 tar czvf TA-pulsedive-feed.tgz TA-pulsedive-feed; mv /tmp/local TA-pulsedive-feed",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+    ]
+}
