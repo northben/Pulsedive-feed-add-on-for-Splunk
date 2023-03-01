@@ -23,8 +23,8 @@ def collect_events(helper, ew):
         "seen": "all",
     }
 
-    response = helper.send_http_request(url, "GET", parameters=parameters, verify=True, use_proxy=True)
     url = "https://pulsedive.com/premium/"
+    response = helper.send_http_request(url, "GET", parameters=parameters, verify=True, use_proxy=True, timeout=30)
 
     for row in csv.DictReader(response.text.splitlines()):
         helper.log_info(row)
