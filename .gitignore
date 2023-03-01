@@ -1,2 +1,4 @@
 __pycache__
 splunk_app_addon-builder
+.DS_Store
+TA-pulsedive-feed/local
